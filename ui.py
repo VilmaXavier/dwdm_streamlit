@@ -1,14 +1,10 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
-import nltk
-from classifier import train_model, predict_spam
+from classifier import train_model, predict_spam, evaluate_model
 from random_forest import train_random_forest_model
 from naive_bayes import train_naive_bayes_model
 from gbm import train_gbm_model
-
-# Ensure NLTK resources are downloaded
-nltk.download('stopwords', quiet=True)
 
 # Define a function to select and train the model based on the chosen algorithm
 def load_model(algorithm, ham_folder, spam_folder):
@@ -26,11 +22,6 @@ def load_model(algorithm, ham_folder, spam_folder):
     # Calculate accuracy for the model
     accuracy = evaluate_model(vectorizer, classifier, X_test_tfidf, y_test)
     return vectorizer, classifier, accuracy
-
-def evaluate_model(vectorizer, classifier, X_test_tfidf, y_test):
-    from sklearn.metrics import accuracy_score
-    predictions = classifier.predict(X_test_tfidf)
-    return accuracy_score(y_test, predictions) * 100  # Convert to percentage
 
 # Streamlit UI
 st.title("Email Spam Detector")

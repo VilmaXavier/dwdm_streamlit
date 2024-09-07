@@ -1,44 +1,40 @@
 import os
 import glob
 import email
+import re
+import nltk
+from nltk.data import find
 from sklearn import svm
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import nltk
-from nltk.data import find
-import re
+from nltk.corpus import stopwords
 
-# Check if 'stopwords' is already downloaded
+# Pre-download NLTK resources and handle exceptions
 def download_nltk_resources():
     try:
-        find('corpora/stopwords.zip')
+        find('corpora/stopwords.zip', paths=['./nltk_data'])
     except LookupError:
-        nltk.download('stopwords')
+        print("Stopwords not found locally. Downloading...")
+        nltk.download('stopwords', download_dir='./nltk_data')
 
 download_nltk_resources()
 
-from nltk.corpus import stopwords
-
+# Function to preprocess text
 def preprocess_text(text):
     text = re.sub(r'[^a-zA-Z\s]', '', text)
     text = text.lower()
     text = text.strip()
     return text
 
+# Function to predict if an email is spam
 def predict_spam(vectorizer, classifier, message):
-    # Preprocess the message
     message = preprocess_text(message)
-    
-    # Transform the message using the vectorizer
     message_tfidf = vectorizer.transform([message])
-    
-    # Predict using the classifier
     prediction = classifier.predict(message_tfidf)
-    
-    # Return result
     return "Spam" if prediction[0] == 1 else "Not Spam"
 
+# Function to load emails from a folder
 def load_emails_from_folder(folder):
     emails = []
     for filepath in glob.glob(os.path.join(folder, '*')):
@@ -55,6 +51,7 @@ def load_emails_from_folder(folder):
                 print(f"Error reading email: {e}")
     return emails
 
+# Function to train the model
 def train_model(ham_folder, spam_folder):
     ham_emails = load_emails_from_folder(ham_folder)
     spam_emails = load_emails_from_folder(spam_folder)
@@ -82,6 +79,7 @@ def train_model(ham_folder, spam_folder):
 
     return vectorizer, classifier, X_test_tfidf, y_test
 
+# Function to evaluate the model
 def evaluate_model(vectorizer, classifier, X_test_tfidf, y_test):
     predictions = classifier.predict(X_test_tfidf)
-    return accuracy_score(y_test, predictions)
+    return accuracy_score(y_test, predictions) * 100  # Convert to percentage
