@@ -10,13 +10,19 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from nltk.corpus import stopwords
 
-# Pre-download NLTK resources and handle exceptions
 def download_nltk_resources():
+    nltk_data_path = './nltk_data'
+    
+    if not os.path.exists(nltk_data_path):
+        os.makedirs(nltk_data_path)
+    
     try:
-        find('corpora/stopwords.zip', paths=['./nltk_data'])
+        find('corpora/stopwords.zip', paths=[nltk_data_path])
+        print("Stopwords are already downloaded.")
     except LookupError:
-        print("Stopwords not found locally. Downloading...")
-        nltk.download('stopwords', download_dir='./nltk_data')
+        print("Stopwords not found. Downloading...")
+        nltk.download('stopwords', download_dir=nltk_data_path)
+        print("Stopwords downloaded.")
 
 download_nltk_resources()
 

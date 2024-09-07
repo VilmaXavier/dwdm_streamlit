@@ -10,31 +10,34 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from nltk.corpus import stopwords
 
-# Pre-download NLTK resources and handle exceptions
 def download_nltk_resources():
+    nltk_data_path = './nltk_data'
+    
+    if not os.path.exists(nltk_data_path):
+        os.makedirs(nltk_data_path)
+    
     try:
-        find('corpora/stopwords.zip', paths=['./nltk_data'])
+        find('corpora/stopwords.zip', paths=[nltk_data_path])
+        print("Stopwords are already downloaded.")
     except LookupError:
-        print("Stopwords not found locally. Downloading...")
-        nltk.download('stopwords', download_dir='./nltk_data')
+        print("Stopwords not found. Downloading...")
+        nltk.download('stopwords', download_dir=nltk_data_path)
+        print("Stopwords downloaded.")
 
 download_nltk_resources()
 
-# Function to preprocess text
 def preprocess_text(text):
     text = re.sub(r'[^a-zA-Z\s]', '', text)
     text = text.lower()
     text = text.strip()
     return text
 
-# Function to predict if an email is spam
 def predict_spam(vectorizer, classifier, message):
     message = preprocess_text(message)
     message_tfidf = vectorizer.transform([message])
     prediction = classifier.predict(message_tfidf)
     return "Spam" if prediction[0] == 1 else "Not Spam"
 
-# Function to load emails from a folder
 def load_emails_from_folder(folder):
     emails = []
     for filepath in glob.glob(os.path.join(folder, '*')):
@@ -51,7 +54,6 @@ def load_emails_from_folder(folder):
                 print(f"Error reading email: {e}")
     return emails
 
-# Function to train the model
 def train_model(ham_folder, spam_folder):
     ham_emails = load_emails_from_folder(ham_folder)
     spam_emails = load_emails_from_folder(spam_folder)
@@ -79,7 +81,6 @@ def train_model(ham_folder, spam_folder):
 
     return vectorizer, classifier, X_test_tfidf, y_test
 
-# Function to evaluate the model
 def evaluate_model(vectorizer, classifier, X_test_tfidf, y_test):
     predictions = classifier.predict(X_test_tfidf)
-    return accuracy_score(y_test, predictions) * 100  # Convert to percentage
+    return accuracy_score(y_test, predictions)
