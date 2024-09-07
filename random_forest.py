@@ -1,15 +1,25 @@
 import os
 import glob
 import email
+import re
+import nltk
+from nltk.data import find
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import nltk
-import re
-
-nltk.download('stopwords')
 from nltk.corpus import stopwords
+
+# Pre-download NLTK resources and handle exceptions
+def download_nltk_resources():
+    try:
+        find('corpora/stopwords.zip', paths=['./nltk_data'])
+    except LookupError:
+        print("Stopwords not found locally. Downloading...")
+        nltk.download('stopwords', download_dir='./nltk_data')
+
+download_nltk_resources()
+
 
 def preprocess_text(text):
     text = re.sub(r'[^a-zA-Z\s]', '', text)
