@@ -1,7 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
-from classifier import train_model, predict_spam, evaluate_model
+from classifier import train_model, predict_spam
 from random_forest import train_random_forest_model
 from naive_bayes import train_naive_bayes_model
 from gbm import train_gbm_model
@@ -22,6 +22,11 @@ def load_model(algorithm, ham_folder, spam_folder):
     # Calculate accuracy for the model
     accuracy = evaluate_model(vectorizer, classifier, X_test_tfidf, y_test)
     return vectorizer, classifier, accuracy
+
+def evaluate_model(vectorizer, classifier, X_test_tfidf, y_test):
+    from sklearn.metrics import accuracy_score
+    predictions = classifier.predict(X_test_tfidf)
+    return accuracy_score(y_test, predictions) * 100  # Convert to percentage
 
 # Streamlit UI
 st.title("Email Spam Detector")
@@ -72,8 +77,11 @@ ax.set_xlabel('Algorithm')
 ax.set_ylabel('Accuracy (%)')
 ax.set_title('Comparison of Model Accuracies')
 
-# Set y-axis range from 95.0 to 99.0
-ax.set_ylim(95.0, 99.0)
+# Dynamically set y-axis range
+if accuracies:
+    min_acc = min([acc for acc in accuracies if acc is not None])
+    max_acc = max([acc for acc in accuracies if acc is not None])
+    ax.set_ylim(min_acc - 1, max_acc + 1)  # Adding some padding for better visibility
 
 # Display the plot
 st.pyplot(fig)
