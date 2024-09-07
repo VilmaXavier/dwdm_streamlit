@@ -6,9 +6,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import nltk
+from nltk.data import find
 import re
 
-nltk.download('stopwords')
+# Check if 'stopwords' is already downloaded
+def download_nltk_resources():
+    try:
+        find('corpora/stopwords.zip')
+    except LookupError:
+        nltk.download('stopwords')
+
+download_nltk_resources()
+
 from nltk.corpus import stopwords
 
 def preprocess_text(text):
@@ -16,8 +25,6 @@ def preprocess_text(text):
     text = text.lower()
     text = text.strip()
     return text
-
-
 
 def predict_spam(vectorizer, classifier, message):
     # Preprocess the message
@@ -31,7 +38,6 @@ def predict_spam(vectorizer, classifier, message):
     
     # Return result
     return "Spam" if prediction[0] == 1 else "Not Spam"
-
 
 def load_emails_from_folder(folder):
     emails = []
