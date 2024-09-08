@@ -28,7 +28,23 @@ def evaluate_model(vectorizer, classifier, X_test_tfidf, y_test):
     predictions = classifier.predict(X_test_tfidf)
     return accuracy_score(y_test, predictions) * 100  # Convert to percentage
 
-# Streamlit UI
+# Sidebar with model descriptions
+st.sidebar.title("Model Descriptions")
+st.sidebar.markdown("""
+### SVM (Support Vector Machine)
+SVM is a supervised learning algorithm which is mainly used for classification problems. It works by finding a hyperplane that best divides a dataset into classes.
+
+### Random Forest
+Random Forest is an ensemble method that builds multiple decision trees and merges them together to get a more accurate and stable prediction.
+
+### Naive Bayes
+Naive Bayes is a simple but powerful algorithm based on the Bayes theorem. It assumes that the features are independent, which makes it particularly suited for spam filtering.
+
+### Gradient Boosting
+Gradient Boosting is a machine learning technique for regression and classification problems, which builds a prediction model in the form of an ensemble of weak prediction models, typically decision trees.
+""")
+
+# Streamlit UI for email spam detector
 st.title("Email Spam Detector")
 
 # Dropdown to select the algorithm
